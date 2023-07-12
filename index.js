@@ -57,7 +57,7 @@ function mainQuestion() {
 }
 
 function viewAllDepartments() {
-  // create the logic to view all departments
+  // retrieve and display all departments
   connection.query("SELECT * FROM department", (err, data) => {
     if (err) throw err;
     console.table(data);
@@ -66,7 +66,7 @@ function viewAllDepartments() {
 }
 
 function viewAllRoles() {
-  // create logic to vbiew all roles
+  // retrieve and display all roles
   connection.query("SELECT * FROM role", (err, data) => {
     if (err) throw err;
     console.table(data);
@@ -75,6 +75,7 @@ function viewAllRoles() {
 }
 
 function viewAllEmployees() {
+  // retrieve and display all employees
   connection.query("SELECT * FROM employee", (err, data) => {
     if (err) throw err;
     console.table(data);
@@ -93,6 +94,7 @@ function addDepartment() {
     ])
     .then((answer) => {
       const departmentName = answer.departmentName;
+      // insert the new department into the database
       connection.query(
         "INSERT INTO department (department_name) VALUES (?)",
         [departmentName],
@@ -128,6 +130,7 @@ function addRole() {
       const roleTitle = answer.title;
       const roleSalary = answer.salary;
       const departmentId = answer.department_id;
+      // insert the new role into the database
       connection.query(
         "INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)",
         [roleTitle, roleSalary, departmentId],
@@ -141,7 +144,7 @@ function addRole() {
 }
 
 function addEmployee() {
-  //first_name, last_name, role_id, manager_id
+  // prompt for employee details
   inquirer
     .prompt([
       {
@@ -171,6 +174,7 @@ function addEmployee() {
       const lastName = answer.last_name;
       const roleId = answer.role_id;
       const managerID = answer.manager_id !== "" ? answer.manager_id : null;
+      // insert the new employee into the database
       connection.query(
         "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?) ",
         [firstName, lastName, roleId, managerID],
@@ -184,7 +188,7 @@ function addEmployee() {
 }
 
 function updateRole() {
-  // Retrieve list of employees
+  // retrieve list of employees
   connection.query(
     'SELECT id, CONCAT(first_name, " ", last_name) AS employee_name FROM employee',
     (err, data) => {
@@ -195,7 +199,7 @@ function updateRole() {
         return acc;
       }, {});
 
-      // Retrieve list of roles
+      // retrieve list of roles
       connection.query("SELECT id, title FROM role", (err, data) => {
         if (err) throw err;
 
@@ -204,7 +208,7 @@ function updateRole() {
           return acc;
         }, {});
 
-        // Prompt to select an employee and new role
+        // prompt to select an employee and new role
         inquirer
           .prompt([
             {
@@ -228,7 +232,7 @@ function updateRole() {
               (key) => roles[key] === answers.newRole
             );
 
-            // Update the selected employee's role
+            // update the selected employee's role
             connection.query(
               "UPDATE employee SET role_id = ? WHERE id = ?",
               [selectedRole, selectedEmployee],
